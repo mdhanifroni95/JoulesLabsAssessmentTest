@@ -1,7 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
 
-Entity({ name: "coupon_usages" });
-
+@Entity({ name: "coupon_usages" })
 @Unique(["couponId", "userId"])
 export class CouponUsage {
   @PrimaryGeneratedColumn("uuid")

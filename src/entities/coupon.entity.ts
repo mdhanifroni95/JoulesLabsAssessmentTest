@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 
-Entity({ name: "coupons" });
+@Entity({ name: "coupons" })
 export class Coupon {
   @PrimaryGeneratedColumn("uuid")
   id: string;
