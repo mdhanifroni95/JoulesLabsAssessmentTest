@@ -1,0 +1,304 @@
+{
+	"info": {
+		"_postman_id": "d8b01361-9331-4d0f-ac76-48e6855a0666",
+		"name": "JoulesLabs Cart & Coupon API",
+		"description": "Postman collection for testing Cart & Coupon Service built with NestJS.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24030979"
+	},
+	"item": [
+		{
+			"name": "Get Cart",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-user-id",
+						"value": "user1"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/cart",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"cart"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Item to Cart",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-user-id",
+						"value": "user1"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"productId\": \"p2\",\n  \"name\": \"T-shirt\",\n  \"unitPrice\": 200,\n  \"quantity\": 4\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/cart/items",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"cart",
+						"items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Item",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-user-id",
+						"value": "user1"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"quantity\": 3\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/cart/items/{{itemId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"cart",
+						"items",
+						"{{itemId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Item",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-user-id",
+						"value": "user1"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/cart/items/{{itemId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"cart",
+						"items",
+						"{{itemId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Coupons",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-user-id",
+						"value": "user1"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"code\": \"DISCOUNT10\",\n  \"discountType\": \"PERCENTAGE\",\n  \"value\": 10,\n  \"startAt\": \"2025-10-01T00:00:00.000Z\",\n  \"endAt\": \"2025-12-03T12:59:59.000Z\",\n  \"maxDiscountAmount\": 100,\n  \"minCartItems\": 2,\n  \"minTotalPrice\": 500,\n  \"productIds\": [\"prod_123\", \"prod_456\"],\n  \"autoApply\": true,\n  \"maxUses\": 100,\n  \"maxUsesPerUser\": 1\n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:3000/coupon/create-coupon",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"coupon",
+						"create-coupon"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all Coupon",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-user-id",
+						"value": "user1"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/coupon",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"coupon"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Coupon by Id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-user-id",
+						"value": "user1"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/coupon/{{items}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"coupon",
+						"{{items}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update Coupon",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-user-id",
+						"value": "user1"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"maxUses\": 50\n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:3000/coupon/{{itemId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"coupon",
+						"{{itemId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apply Coupon",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-user-id",
+						"value": "user1"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n//   \"code\": \"SUMMER10\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/cart/apply-coupon",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"cart",
+						"apply-coupon"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "itemId",
+			"value": "PUT_YOUR_ITEM_ID_HERE"
+		}
+	]
+}
