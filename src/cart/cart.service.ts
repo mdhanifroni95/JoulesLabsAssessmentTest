@@ -1,9 +1,16 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CartEntity } from "../entities/cart.entity";
 import { CartItemEntity } from "../entities/cart-item.entity";
 import { CouponService } from "src/coupon/coupon.service";
+import { th } from "@faker-js/faker/.";
+import { error } from "console";
+import { stat } from "fs";
 @Injectable()
 export class CartService {
   constructor(
@@ -33,6 +40,7 @@ export class CartService {
   ) {
     const cart = await this.getOrCreateCart(userId);
     const existing = cart.items.find((i) => i.productId === itemDto.productId);
+    console.log("existing item", existing);
     if (existing) {
       existing.quantity += itemDto.quantity;
     } else {
@@ -80,45 +88,63 @@ export class CartService {
     cart.appliedCouponCode = undefined;
 
     if (manualCouponCode) {
+      // console.log("applying manual coupon", manualCouponCode);
       // try to apply manual coupon (atomic)
       const result = await this.couponService.applyCouponAtomically(
         manualCouponCode,
         { items: cart.items, totalBeforeDiscount: total },
         userId,
       );
+      // console.log("manual coupon result", result);
       cart.discountAmount = result.discount;
       cart.appliedCouponCode = result.couponCode;
     } else {
       // auto-apply best eligible coupon
       const candidates = await this.couponService.getAutoApplyCandidates();
-      let best: { discount: number; code: string | null } = {
-        discount: 0,
-        code: null,
-      };
-      for (const c of candidates) {
-        const validation = this.couponService.validateAndCalculateDiscount(
-          c,
-          { items: cart.items, totalBeforeDiscount: total },
-          userId,
-        );
-        if (validation?.valid && validation.discount > best.discount) {
-          best = { discount: validation.discount, code: c.code };
-        }
-      }
-      if (best.code) {
-        // attempt to atomically apply chosen coupon (might fail if someone else consumed last use)
-        try {
-          const res = await this.couponService.applyCouponAtomically(
-            best.code,
+      // console.log("auto-apply candidates", candidates);
+      // console.log("auto-apply candidates", candidates?.length);
+      if (candidates.length === 0) {
+        throw new BadRequestException("No coupons found");
+      } else {
+        let best: { discount: number; code: string | null } = {
+          discount: 0,
+          code: null,
+        };
+        for (const c of candidates) {
+          const validation = this.couponService.validateAndCalculateDiscount(
+            c,
             { items: cart.items, totalBeforeDiscount: total },
             userId,
           );
-          cart.discountAmount = res.discount;
-          cart.appliedCouponCode = res.couponCode;
-        } catch (e) {
-          // if race caused apply to fail, we skip coupon (or you can retry to next best)
-          cart.discountAmount = 0;
-          cart.appliedCouponCode = undefined;
+          // console.log("validation", validation);
+          if (validation?.valid && validation.discount > best.discount) {
+            best = { discount: validation.discount, code: c.code };
+          }
+        }
+        // console.log("best auto-apply coupon", best);
+        if (best.code) {
+          // console.log("applying auto coupon", best.code);
+          // attempt to atomically apply chosen coupon (might fail if someone else consumed last use)
+          try {
+            // console.log("before applyCouponAtomically");
+            const res = await this.couponService.applyCouponAtomically(
+              best.code,
+              { items: cart.items, totalBeforeDiscount: total },
+              userId,
+            );
+            console.log("auto-apply coupon result", res);
+            cart.discountAmount = res.discount;
+            cart.appliedCouponCode = res.couponCode;
+          } catch (e) {
+            // console.log("auto-apply coupon failed", e);
+            // if race caused apply to fail, we skip coupon (or you can retry to next best)
+            cart.discountAmount = 0;
+            cart.appliedCouponCode = undefined;
+            // return {
+            //   message: e.message || "Failed to apply coupon",
+            //   status: e.status || 400,
+            // };
+          }
         }
       }
     }

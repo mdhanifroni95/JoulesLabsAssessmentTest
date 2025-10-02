@@ -17,6 +17,38 @@ export class CouponService {
     private usageRepo: Repository<CouponUsageEntity>,
   ) {}
 
+  async createCoupon(dto: CreateCouponDto) {
+    const now = new Date();
+    const getCoupon = await this.couponRepo
+      .createQueryBuilder("c")
+      .where("c.code = :code", { code: dto.code })
+      .andWhere("(c.endAt IS NULL OR c.endAt >= :now)", { now })
+      .getOne();
+    if (getCoupon) {
+      throw new BadRequestException("Coupon code already exists");
+    }
+    const coupon = this.couponRepo.create(dto);
+    return await this.couponRepo.save(coupon);
+  }
+
+  async findAll() {
+    return await this.couponRepo.find();
+  }
+
+  async findOne(id: string) {
+    return await this.couponRepo.findOne({ where: { id } });
+  }
+
+  async updateCoupon(id: string, dto: UpdateCouponDto) {
+    const coupon = await this.couponRepo.findOne({ where: { id } });
+    if (!coupon) {
+      throw new BadRequestException("Coupon not found");
+    } else {
+      Object.assign(coupon, dto);
+      return await this.couponRepo.save(coupon);
+    }
+  }
+
   //retrieve coupon by code
   findByCode(code: string) {
     return this.couponRepo.findOne({ where: { code } });
@@ -122,18 +154,26 @@ export class CouponService {
       const now = new Date();
       if (coupon.startAt && coupon.startAt > now)
         throw new BadRequestException("Coupon not started");
+
       if (coupon.endAt && coupon.endAt < now)
         throw new BadRequestException("Coupon expired");
+
+      // console.log("coupon", coupon);
+      // console.log("cartSnapshot", cartSnapshot);
+      // console.log("cartSnapshot length", cartSnapshot.items.length);
+
       if (
         coupon.minCartItems &&
         cartSnapshot.items.length < coupon.minCartItems
       )
         throw new BadRequestException(`Min items ${coupon.minCartItems}`);
+
       if (
         coupon.minTotalPrice &&
         cartSnapshot.totalBeforeDiscount < coupon.minTotalPrice
       )
         throw new BadRequestException(`Min total ${coupon.minTotalPrice}`);
+
       if (coupon.productIds && coupon.productIds.length > 0) {
         const hasProduct = cartSnapshot.items.some((i) =>
           coupon.productIds.includes(i.productId),
@@ -143,7 +183,7 @@ export class CouponService {
             "Coupon not applicable to products in cart",
           );
       }
-
+      // console.log("coupon after checks", coupon);
       if (coupon.maxUses != null && coupon.totalUses >= coupon.maxUses)
         throw new BadRequestException("Coupon max uses reached");
 

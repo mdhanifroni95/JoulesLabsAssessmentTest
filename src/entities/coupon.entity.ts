@@ -1,4 +1,4 @@
-import { DiscountType } from "src/utils/enum";
+import { DiscountType } from "../utils/enum";
 import {
   Column,
   CreateDateColumn,

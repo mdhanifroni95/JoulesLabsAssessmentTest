@@ -48,7 +48,7 @@ export class CartController {
   async applyCoupon(@Body() body: ApplyCouponDto, @Req() req) {
     const userId = this.getUserId(req);
     const cart = await this.cartService.getOrCreateCart(userId);
-    return this.cartService.recalculateCart(cart, userId, body.code);
+    return await this.cartService.recalculateCart(cart, userId, body.code);
   }
 
   @Get()
