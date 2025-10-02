@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  nestjs-app:
+    build: .
+    container_name: joules-labs
+    working_dir: /joules-labs/src/
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    command: sh -c "npm run seed && npm run start:dev"
