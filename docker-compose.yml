@@ -7,6 +7,4 @@ services:
     working_dir: /joules-labs/src/
     env_file:
       - .env
-    ports:
-      - "3000:3000"
     command: sh -c "npm run seed && npm run start:dev"
