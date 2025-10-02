@@ -1,4 +1,4 @@
-# Use Node.js 22 LTS
+# Use Node.js 22.17.1 Alpine
 FROM node:22.17.1-alpine
 
 WORKDIR /usr/src/app
@@ -7,12 +7,14 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 
-# Copy source
+# Copy source code
 COPY . .
 
 # Build TypeScript
 RUN npm run build
 
+# Expose port
 EXPOSE 3000
 
-CMD ["npm", "run", "start:dev"]
+# Run seeder then start app
+CMD ["sh", "-c", "npm run seed && npm run start:dev"]
